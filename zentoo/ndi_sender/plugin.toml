@@ -1,0 +1,58 @@
+# NDI Sender — broadcast the desktop as NDI on the LAN.
+#
+# Shells out to `zentoo-ndi-cast` (the helper that owns the portal handshake
+# + gst pipeline). The Luau side is pure orchestration: state machine in the
+# headless [[service]], thin presentation in the [[widget]] and [[shortcut]].
+#
+# Click mapping (widget + shortcut): left = toggle stream.
+
+id = "zentoo/ndi_sender"
+name = "NDI Sender"
+version = "0.1.0"
+min_noctalia = "5.0.0"
+author = "zentoo"
+license = "MIT"
+tags = ["video", "ndi", "screencast"]
+icon = "video"
+description = "Broadcast the desktop as NDI on the LAN."
+
+[[setting]]
+key = "source_type"
+type = "select"
+label = "Source type"
+default = "both"
+description = "What the portal popup may pick."
+options = [
+  { value = "both", label = "Display or window" },
+  { value = "monitor", label = "Display only" },
+  { value = "window", label = "Window only" },
+]
+
+[[setting]]
+key = "hide_inactive"
+type = "bool"
+label = "Hide widget when idle"
+default = false
+
+[[setting]]
+key = "restore_portal"
+type = "bool"
+label = "Restore portal session"
+description = "Persist + reuse the portal session token across runs (skips the popup on subsequent runs)."
+default = false
+advanced = true
+
+# Headless service: owns stream state, bridges the command/status channels.
+[[service]]
+id = "service"
+entry = "service.luau"
+
+# Bar tile. Mirrors "status", drives via "command".
+[[widget]]
+id = "sender"
+entry = "widget.luau"
+
+# Control-center quick tile.
+[[shortcut]]
+id = "toggle"
+entry = "shortcut.luau"
